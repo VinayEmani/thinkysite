@@ -1,0 +1,24 @@
+<form id="loginform" method="post" action="/testapp/signup/">
+    {% csrf_token %}
+
+    <label for="username_fld">Username: <br>
+    <input id="username_fld" type="text" name="username" /> <br>
+
+    <label for="password_fld">Password: <br>
+    <input id="password_fld" type="password" name="password" /> <br>
+
+    <label for="confirm_password_fld">Type password again: <br>
+    <input id="confirm_password_fld" type="password" name="password2" /> <br>
+
+    <label for="email_fld">Email address: <br>
+    <input id="email_fld" type="text" name="email" /> <br>
+
+    <label for="first_name_fld">First name: <br>
+    <input id="first_name_fld" type="text" name="firstname"/> <br>
+
+    <label for="last_name_fld">Last name: <br>
+    <input id="last_name_fld" type="text" name="lastname"/> <br>
+
+    <br>
+    <button id="signup-form-submit-button" >Register</button>
+</form>

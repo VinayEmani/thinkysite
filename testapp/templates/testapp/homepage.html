@@ -1,0 +1,14 @@
+{% extends 'testapp/base.html' %}
+
+{% block title %}
+Thinky - Daily food for your brain
+{% endblock %}
+
+{% block maincontent %}
+{% for board in boards %}
+<div style="border: solid gray 1px;">
+    {{ board.board_desc }} <br>
+    <a href="/board/?boardid={{ board.id }}" >{{ board.board_name }}</a>
+</div>
+{% endfor %}
+{% endblock %}

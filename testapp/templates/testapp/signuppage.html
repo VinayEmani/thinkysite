@@ -1,0 +1,11 @@
+{% extends 'testapp/base.html' %}
+
+{% block maincontent %}
+{% if messages %}
+    {% for msg in messages %}
+    <p>{{ msg }}</p>
+    {% endfor %}
+{% endif %}
+
+{% include 'testapp/signupform.html' %}
+{% endblock %}
