@@ -8,6 +8,8 @@ from django.contrib.auth.models import User
 from django.core.validators import validate_email
 from django.template import loader
 from django.views.decorators.http import require_http_methods, require_POST, require_GET
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from .models import Board
 

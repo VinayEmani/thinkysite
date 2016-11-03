@@ -1,1 +1,7 @@
 db.sqlite3
+
+__pycache__
+
+*.sw[op]
+
+migrations
