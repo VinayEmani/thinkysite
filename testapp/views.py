@@ -1,5 +1,7 @@
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django import forms
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -8,10 +10,8 @@ from django.contrib.auth.models import User
 from django.core.validators import validate_email
 from django.template import loader
 from django.views.decorators.http import require_http_methods, require_POST, require_GET
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
-from .models import Board
+from .models import ThinkyUser, Board
 
 # Create your views here.
 def index(request):
@@ -30,12 +30,75 @@ def homepage(request):
 @login_required(login_url='/testapp/loginpage/')
 @require_GET
 def profilepage(request):
+    pid = request.GET.get('pid', None)
+    if not pid:
+        pid = request.user.id
+
+    if pid == request.user.id:
+        profile = request.user.thinkyuser
+    else:
+        try:
+            profile = ThinkyUser.objects.get(user_id=pid)
+        except ThinkyUser.DoesNotExist as exe:
+            template = loader.get_template('testapp/profilenotfound.html')
+            return HttpResponse(template.render(dict(), request))
+
+    has_pic = profile.profile_pic != ''
     template = loader.get_template('testapp/profilepage.html')
+    profile_full_name = profile.user.first_name + ' ' + profile.user.last_name
     context = {
         'user': request.user,
+        'has_pic': has_pic,
+        'profile_full_name': profile_full_name,
+        'profile': profile,
     }
-
     return HttpResponse(template.render(context, request))
+
+class ProfileUpdateForm(forms.Form):
+    image = forms.ImageField()
+
+@require_POST
+def profile_update(request):
+    form = ProfileUpdateForm(request.POST, request.FILES)
+    if form.is_valid():
+        profile = ThinkyUser.objects.get(user_id=request.user.id)
+        profile.profile_pic = form.cleaned_data['image']
+        profile.save()
+    else:
+        messages.add_message(request, messages.INFO,
+                "Invalid image file uploaded.")
+
+    return HttpResponseRedirect(reverse('testapp-profilepage'))
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['password', 'first_name', 'last_name']
+
+@require_POST
+def user_data_update(request):
+    instance = User.objects.get(id=request.user.id)
+    form = UserUpdateForm(request.POST, instance=instance)
+    if form.is_valid():
+        pass1, pass2 = form.cleaned_data['password'], form.data['password2']
+        if pass1 != pass2:
+            messages.add_message(request, messages.INFO,
+                "Passwords don't match.")
+            return HttpResponseRedirect(reverse('testapp-profilepage'))
+        elif not is_strong_password(pass1):
+            messages.add_message(request, messages.INFO,
+                "Password not strong enough.")
+            return HttpResponseRedirect(reverse('testapp-profilepage'))
+
+        instance.set_password(form.cleaned_data['password'])
+        instance.first_name = form.cleaned_data['first_name']
+        instance.last_name = form.cleaned_data['last_name']
+        instance.save()
+    else:
+        for err in form.errors:
+            messages.add_message(request, messages.INFO, err)
+
+    return HttpResponseRedirect(reverse('testapp-profilepage'))
 
 def is_strong_password(password):
     if len(password) < 8:

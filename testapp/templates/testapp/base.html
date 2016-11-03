@@ -3,6 +3,7 @@
     <head>
         <title>
             {% block title %}
+                Thinky
             {% endblock %}
         </title>
 
@@ -21,7 +22,7 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="navbar-header col-lg-1 col-md-4">
-                            <a class="navbar-brand" href="http://www.thinky.com">Thinky</a>
+                            <a class="navbar-brand" href="/testapp/">Thinky</a>
                         </div>
 
                         <div style="color: grey;"
@@ -82,6 +83,8 @@
                 </div>
 
                 <div class="col-lg-3">
+                    {% block rightcol %}
+                    {% endblock %}
                 </div>
             </div>
         </div>

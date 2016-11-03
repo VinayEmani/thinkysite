@@ -1,4 +1,94 @@
 {% extends 'testapp/base.html' %}
 
 {% block maincontent %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-1">
+        </div>
+
+        <div id="profilepic" class="col-lg-3">
+            <div class="container-fluid">
+                <div class="row">
+                    {% if not has_pic %}
+                    <img class="img-rounded" src="/static/default-avatar.png" width="200" height="200"
+                    title="{{ user.first_name }}"
+                    alt="{{ user.first_name }}"/>
+                    {% else %}
+                    <img class="img-rounded" src="/files/{{ user.thinkyuser.profile_pic }}" width="200"
+                    height="200" title="{{
+                    profile.user.first_name }}" alt="{{
+                    profile.user.first_name }}"/>
+                    {% endif %}
+                </div>
+
+                <div class="row" style="text-align: center;">
+                    <p> {{ profile_full_name }} </p>
+                </div>
+
+                <div class="row" style="text-align: center;">
+                    {% if messages %}
+                        {% for msg in messages %}
+                        <p><b>{{ msg }}</b></p>
+                        {% endfor %}
+                    {% endif %}
+                    <br>
+                    {% ifequal profile.user_id user.id %}
+                        <br>
+                        <form action="/testapp/profileupdate/" method="post"
+                            enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <p>
+                            <label class="btn btn-default btn-file">
+                                Upload new pic<input name="image" type="file" style="display: none;">
+                            </label>
+                            <br>
+                            <input class="btn btn-default" type="submit" name="Submit"/>
+                            </p>
+                        </form>
+                    {% endifequal %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-1">
+        </div>
+
+        <div id="profileinfo" class="col-lg-4">
+            {% ifequal user.id profile.user_id %}
+            <div style="font-weight: bold; text-align: center;">
+                <p>Update your profile info.</p>
+            </div>
+            <br>
+            <form class="form-horizontal" action="/testapp/userupdate/" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" name="password" class="form-control" id="password">
+                </div>
+
+                <div class="form-group">
+                    <label for="password2">Type password again:</label>
+                    <input type="password" name="password2" class="form-control" id="password2">
+                </div>
+
+                <div class="form-group">
+                    <label for="firstname">First name:</label>
+                    <input type="text" class="form-control" name="first_name" id="firstname">
+                </div>
+
+                <div class="form-group">
+                    <label for="lastname">Last name:</label>
+                    <input type="text" class="form-control" name="last_name" id="username">
+                </div>
+                <input type="submit" name="Submit" class="btn btn-default"/>
+            </form>
+            {% else %}
+            {% endifequal %}
+        </div>
+
+        <div id="rightside" class="col-lg-3">
+        </div>
+
+    </div>
+</div>
 {% endblock %}
