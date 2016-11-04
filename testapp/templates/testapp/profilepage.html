@@ -9,16 +9,9 @@
         <div id="profilepic" class="col-lg-3">
             <div class="container-fluid">
                 <div class="row">
-                    {% if not has_pic %}
-                    <img class="img-rounded" src="/static/default-avatar.png" width="200" height="200"
-                    title="{{ user.first_name }}"
-                    alt="{{ user.first_name }}"/>
-                    {% else %}
-                    <img class="img-rounded" src="/files/{{ user.thinkyuser.profile_pic }}" width="200"
-                    height="200" title="{{
-                    profile.user.first_name }}" alt="{{
-                    profile.user.first_name }}"/>
-                    {% endif %}
+                    <img class="img-rounded" src="/files/{{ pic }}" width="200" height="200"
+                    title="{{ profile.first_name }}"
+                    alt="{{ profile.first_name }}"/>
                 </div>
 
                 <div class="row" style="text-align: center;">
@@ -32,7 +25,7 @@
                         {% endfor %}
                     {% endif %}
                     <br>
-                    {% ifequal profile.user_id user.id %}
+                    {% ifequal profile.id user.id %}
                         <br>
                         <form action="/testapp/profileupdate/" method="post"
                             enctype="multipart/form-data">
@@ -54,7 +47,7 @@
         </div>
 
         <div id="profileinfo" class="col-lg-4">
-            {% ifequal user.id profile.user_id %}
+            {% ifequal user.id profile.id %}
             <div style="font-weight: bold; text-align: center;">
                 <p>Update your profile info.</p>
             </div>

@@ -35,20 +35,20 @@ def profilepage(request):
         pid = request.user.id
 
     if pid == request.user.id:
-        profile = request.user.thinkyuser
+        profile = request.user
     else:
         try:
-            profile = ThinkyUser.objects.get(user_id=pid)
-        except ThinkyUser.DoesNotExist as exe:
+            profile = User.objects.get(id=pid)
+        except User.DoesNotExist as exe:
             template = loader.get_template('testapp/profilenotfound.html')
             return HttpResponse(template.render(dict(), request))
 
-    has_pic = profile.profile_pic != ''
+    pic = ThinkyUser.objects.get(user_id=pid).profile_pic or "pics/default-avatar.png"
     template = loader.get_template('testapp/profilepage.html')
-    profile_full_name = profile.user.first_name + ' ' + profile.user.last_name
+    profile_full_name = profile.first_name + ' ' + profile.last_name
     context = {
         'user': request.user,
-        'has_pic': has_pic,
+        'pic': pic,
         'profile_full_name': profile_full_name,
         'profile': profile,
     }
