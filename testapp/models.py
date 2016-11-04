@@ -8,6 +8,7 @@ from django.dispatch import receiver
 class ThinkyUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_pic = models.ImageField(upload_to='pics/', blank=True)
+    is_mod = models.BooleanField(default=False)
 
     def __str__(self):
         return '%s\'s profile' % self.user.username

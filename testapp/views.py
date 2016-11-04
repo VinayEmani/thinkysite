@@ -21,9 +21,15 @@ def index(request):
 def homepage(request):
     template = loader.get_template('testapp/homepage.html')
     boards = Board.objects.all()
+    is_mod = False
+    if request.user.is_authenticated:
+        profile = ThinkyUser.objects.get(user_id=request.user.id)
+        is_mod = profile.is_mod
+
     context = {
         'boards': boards,
         'user': request.user,
+        'is_mod': is_mod,
     }
     return HttpResponse(template.render(context, request))
 
@@ -43,7 +49,8 @@ def profilepage(request):
             template = loader.get_template('testapp/profilenotfound.html')
             return HttpResponse(template.render(dict(), request))
 
-    pic = ThinkyUser.objects.get(user_id=pid).profile_pic or "pics/default-avatar.png"
+    thinky_profile = ThinkyUser.objects.get(user_id=pid)
+    pic = thinky_profile.profile_pic or "pics/default-avatar.png"
     template = loader.get_template('testapp/profilepage.html')
     profile_full_name = profile.first_name + ' ' + profile.last_name
     context = {
