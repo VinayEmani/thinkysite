@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.core.validators import validate_email
 from django.template import loader
@@ -17,6 +17,14 @@ from .models import ThinkyUser, Board
 def index(request):
     return HttpResponse('Welcome to test app django project.')
 
+def get_base_context(request, **kwargs):
+    user = request.user
+    if 'is_mod' in kwargs:
+        is_mod = kwargs.get('is_mod')
+    else:
+        is_mod = ThinkyUser.objects.get(user_id=user.id).is_mod
+    return dict(user=user, is_mod=is_mod)
+
 @require_GET
 def homepage(request):
     template = loader.get_template('testapp/homepage.html')
@@ -26,11 +34,8 @@ def homepage(request):
         profile = ThinkyUser.objects.get(user_id=request.user.id)
         is_mod = profile.is_mod
 
-    context = {
-        'boards': boards,
-        'user': request.user,
-        'is_mod': is_mod,
-    }
+    context = get_base_context(request, is_mod=is_mod)
+    context['boards'] = boards
     return HttpResponse(template.render(context, request))
 
 @login_required(login_url='/testapp/loginpage/')
@@ -47,18 +52,15 @@ def profilepage(request):
             profile = User.objects.get(id=pid)
         except User.DoesNotExist as exe:
             template = loader.get_template('testapp/profilenotfound.html')
-            return HttpResponse(template.render(dict(), request))
+            return HttpResponse(template.render(get_base_context(request), request))
 
     thinky_profile = ThinkyUser.objects.get(user_id=pid)
     pic = thinky_profile.profile_pic or "pics/default-avatar.png"
     template = loader.get_template('testapp/profilepage.html')
     profile_full_name = profile.first_name + ' ' + profile.last_name
-    context = {
-        'user': request.user,
-        'pic': pic,
-        'profile_full_name': profile_full_name,
-        'profile': profile,
-    }
+    context = get_base_context(request)
+    context.update(pic=pic, profile_full_name=profile_full_name,
+                   profile=profile)
     return HttpResponse(template.render(context, request))
 
 class ProfileUpdateForm(forms.Form):
@@ -106,6 +108,22 @@ def user_data_update(request):
             messages.add_message(request, messages.INFO, err)
 
     return HttpResponseRedirect(reverse('testapp-profilepage'))
+
+def is_a_mod(user):
+    if not user.is_authenticated:
+        return False
+    profile = ThinkyUser.objects.get(user_id=user.id)
+    return profile.is_mod
+
+@user_passes_test(is_a_mod)
+@require_GET
+def modpage(request):
+    template = loader.get_template('testapp/modpage.html')
+    context = get_base_context(is_mod=True)
+    all_mods = ThinkyUser.objects.get(is_mod=True)
+    boards = Board.objects.all()
+    context.update(all_mods=all_mods, boards=boards)
+    return HttpResponse(template.render(context, request))
 
 def is_strong_password(password):
     if len(password) < 8:
