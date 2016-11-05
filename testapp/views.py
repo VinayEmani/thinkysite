@@ -137,7 +137,6 @@ def modpage(request):
 @user_passes_test(is_a_mod, redirect_field_name=None)
 @require_POST
 def addnewmod(request):
-    print(request.POST)
     newmodname = request.POST.get('newmod')
     if not newmodname:
         return HttpResponseBadRequest('Bad request, empty username.')

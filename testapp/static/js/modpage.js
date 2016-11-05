@@ -12,7 +12,7 @@ function loadModList() {
             for (var e in data) {
                 var elem = document.createElement("a");
                 elem.href = "/testapp/profile/?pid=" + data[e];
-                elem.innerHTML = "<b><u>" + e + "</u></b>";
+                elem.innerHTML = "<b><u> " + e + " </u></b>";
                 mod_list_elem.appendChild(elem);
             }
          },
