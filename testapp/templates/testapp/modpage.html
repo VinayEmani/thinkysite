@@ -1,4 +1,67 @@
 {% extends 'testapp/base.html' %}
 
+{% block extra_includes %}
+<script type="text/javascript" src="/static/js/modpage.js"></script>
+{% endblock %}
+
 {% block maincontent %}
+<div class="container-fluid">
+    <div id="current-mods" class="row">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                Moderators
+            </div>
+
+            <div class="panel-body">
+                <p id="cur-mod-list">
+                {% for name in mods_with_names %}
+                <b><u><a href="/testapp/profile/?pid={{ name.1.user_id }}">{{ name.0 }}</a></u></b>
+                {% endfor %}
+                </p>
+
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-3" style="padding: 0;">
+                            <form action="/testapp/addnewmod/" method="post" id="add-mod-form" class="form-inline">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <input type="text" id="add-mod-field" placeholder="mod name to add" name="newmod"/>
+                                </div>
+                                <button type="submit" id="add-mod-button" class="btn btn-primary">Add</button>
+                            </form>
+                        </div>
+                        <div class="col-lg-4" style="padding: 0;">
+                            <form action="/testapp/deloldmod/" method="post"
+                                id="del-old-mod" class="form-inline">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <input type="text" id="del-mod-field" placeholder="mod name to remove" name="oldmod"/>
+                                </div>
+                                <button type="submit" id="del-mod-button" class="btn btn-primary">Remove</button>
+                            </form>
+                        </div>
+                        <div class="col-lg-5">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="boards-div" class="row">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                Boards
+            </div>
+
+            <div class="panel-body">
+                <p>
+                {% for board in boards%}
+                <b><a href="/testapp/board/?boardid={{ board.id }}">{{ board.board_name }} </a></b><br>
+                {% endfor %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django import forms
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -90,19 +90,26 @@ def user_data_update(request):
     form = UserUpdateForm(request.POST, instance=instance)
     if form.is_valid():
         pass1, pass2 = form.cleaned_data['password'], form.data['password2']
+        modified = False
         if pass1 != pass2:
             messages.add_message(request, messages.INFO,
                 "Passwords don't match.")
             return HttpResponseRedirect(reverse('testapp-profilepage'))
-        elif not is_strong_password(pass1):
+        elif pass1 and not is_strong_password(pass1):
             messages.add_message(request, messages.INFO,
                 "Password not strong enough.")
             return HttpResponseRedirect(reverse('testapp-profilepage'))
-
-        instance.set_password(form.cleaned_data['password'])
-        instance.first_name = form.cleaned_data['first_name']
-        instance.last_name = form.cleaned_data['last_name']
-        instance.save()
+        elif is_strong_password(pass1):
+            instance.set_password(form.cleaned_data['password'])
+            modified = True
+        if form.cleaned_data['first_name']:
+            instance.first_name = form.cleaned_data['first_name']
+            modified = True
+        if form.cleaned_data['last_name']:
+            instance.last_name = form.cleaned_data['last_name']
+            modified = True
+        if modified:
+            instance.save()
     else:
         for err in form.errors:
             messages.add_message(request, messages.INFO, err)
@@ -115,20 +122,69 @@ def is_a_mod(user):
     profile = ThinkyUser.objects.get(user_id=user.id)
     return profile.is_mod
 
-@user_passes_test(is_a_mod)
+@user_passes_test(is_a_mod, redirect_field_name=None)
 @require_GET
 def modpage(request):
     template = loader.get_template('testapp/modpage.html')
-    context = get_base_context(is_mod=True)
-    all_mods = ThinkyUser.objects.get(is_mod=True)
+    context = get_base_context(request, is_mod=True)
+    all_mods = ThinkyUser.objects.filter(is_mod=True)
+    mods_with_names = [(User.objects.get(id=mod.user_id).username, mod) for mod in all_mods]
     boards = Board.objects.all()
-    context.update(all_mods=all_mods, boards=boards)
+    context.update(mods_with_names=mods_with_names, all_mods=all_mods, boards=boards)
     return HttpResponse(template.render(context, request))
 
+@user_passes_test(is_a_mod, redirect_field_name=None)
+@require_POST
+def addnewmod(request):
+    newmodname = request.POST.get('newmod')
+    if not newmodname:
+        return HttpResponseBadRequest('Bad request, empty username.')
+    else:
+        users = User.objects.filter(username=newmodname)
+        if not users:
+            return HttpResponseBadRequest('Bad request, no such user.')
+        profile = ThinkyUser.objects.get(user_id=users[0].id)
+        if profile.is_mod:
+            return HttpResponse('User already a mod.')
+        profile.is_mod = True
+        profile.save()
+        return HttpResponse('Operation success.')
+
+@user_passes_test(is_a_mod, redirect_field_name=None)
+@require_POST
+def deloldmod(request):
+    print(request.POST)
+    oldmodname = request.POST.get('oldmod')
+    if not oldmodname:
+        return HttpResponseBadRequest('Bad request, empty username.')
+    else:
+        users = User.objects.filter(username=oldmodname)
+        if not users:
+            return HttpResponseBadRequest('Bad request, no such user.')
+        profile = ThinkyUser.objects.get(user_id=users[0].id)
+        if not profile.is_mod:
+            return HttpResponse('User not a mod.')
+        profile.is_mod = False
+        profile.save()
+        return HttpResponse('Operation success.')
+
+@user_passes_test(is_a_mod, redirect_field_name=None)
+@require_POST
+def deloldmod(request):
+    oldmodname = request.POST.get('oldmod')
+    if not oldmodname:
+        return HttpResponseBadRequest('Bad request, empty username.')
+    else:
+        users = User.objects.filter(username=oldmodname)
+        if not users:
+            return HttpResponseBadRequest('Bad request, no such user.')
+        profile = ThinkyUser.objects.get(user_id=users[0].id)
+        if not profile.is_mod:
+            return HttpResponse('User not a mod.')
+        profile.is_mod = False
+
 def is_strong_password(password):
-    if len(password) < 8:
-        return False
-    return any(not c.isdigit() for c in password)
+    return len(password) >= 8 and any(c.isdigit() for c in password)
 
 @require_POST
 def signup(request):
@@ -203,7 +259,7 @@ def logoutpage(request):
     template = loader.get_template('testapp/logoutpage.html')
     return HttpResponse(template.render(dict(), request))
 
-@require_http_methods(['POST'])
+@require_POST
 def logout_user(request):
     logout(request)
     return HttpResponseRedirect(reverse('testapp-homepage'))

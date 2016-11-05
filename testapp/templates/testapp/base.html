@@ -2,17 +2,25 @@
 <html lang="en">
     <head>
         <title>
-            {% block title %}
-                Thinky
-            {% endblock %}
+            {% block title %}Thinky{% endblock %}
         </title>
 
         <link rel="stylesheet"
         href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
 
         <script
+            src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous">
+        </script>
+
+        <script
         src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js">
         </script>
+
+        <!-- Any extra css/js files to be included with the page. -->
+        {% block extra_includes %}
+        {% endblock %}
     </head>
 
     <body class="bg-info">
