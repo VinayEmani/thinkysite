@@ -3,6 +3,7 @@ from django.urls import reverse
 from django import forms
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
+from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -167,6 +168,16 @@ def deloldmod(request):
         profile.is_mod = False
         profile.save()
         return HttpResponse('Operation success.')
+
+@user_passes_test(is_a_mod, redirect_field_name=None)
+@require_GET
+def curmodlist(request):
+    mods = ThinkyUser.objects.filter(is_mod=True)
+    ret = dict()
+    for mod in mods:
+        usr = User.objects.get(id=mod.user_id)
+        ret[usr.username] = mod.user_id
+    return JsonResponse(ret)
 
 def is_strong_password(password):
     return len(password) >= 8 and any(c.isdigit() for c in password)

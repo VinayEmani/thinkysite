@@ -1,3 +1,26 @@
+function loadModList() {
+    // Send a http request to /testapp/curmodlist and get all the mod list.
+    $.ajax({
+        "type": "GET",
+        "url": "/testapp/curmodlist/",
+        "async": "false",
+        "success": function(data) {
+            var mod_list_elem = $("#cur-mod-list")[0];
+            while (mod_list_elem.hasChildNodes())
+                mod_list_elem.removeChild(mod_list_elem.lastChild);
+
+            for (var e in data) {
+                var elem = document.createElement("a");
+                elem.href = "/testapp/profile/?pid=" + data[e];
+                elem.innerHTML = "<b><u>" + e + "</u></b>";
+                mod_list_elem.appendChild(elem);
+            }
+         },
+        "error": function(xhr) {
+        }
+    });
+}
+
 function updateMods(form_field_id, url, data_key) {
     return function(e) {
         e.preventDefault();
@@ -13,8 +36,10 @@ function updateMods(form_field_id, url, data_key) {
             beforeSend: function(req) {
                 req.setRequestHeader('X-CSRFToken', csrftoken);
             },
+
             success: function(data) {
-                alert(data);
+                // Ideally, we should display the new mod list.
+                loadModList();
             },
 
             error: function(req, status, error) {
