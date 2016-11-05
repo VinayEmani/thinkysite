@@ -136,6 +136,7 @@ def modpage(request):
 @user_passes_test(is_a_mod, redirect_field_name=None)
 @require_POST
 def addnewmod(request):
+    print(request.POST)
     newmodname = request.POST.get('newmod')
     if not newmodname:
         return HttpResponseBadRequest('Bad request, empty username.')
@@ -153,7 +154,6 @@ def addnewmod(request):
 @user_passes_test(is_a_mod, redirect_field_name=None)
 @require_POST
 def deloldmod(request):
-    print(request.POST)
     oldmodname = request.POST.get('oldmod')
     if not oldmodname:
         return HttpResponseBadRequest('Bad request, empty username.')
@@ -167,21 +167,6 @@ def deloldmod(request):
         profile.is_mod = False
         profile.save()
         return HttpResponse('Operation success.')
-
-@user_passes_test(is_a_mod, redirect_field_name=None)
-@require_POST
-def deloldmod(request):
-    oldmodname = request.POST.get('oldmod')
-    if not oldmodname:
-        return HttpResponseBadRequest('Bad request, empty username.')
-    else:
-        users = User.objects.filter(username=oldmodname)
-        if not users:
-            return HttpResponseBadRequest('Bad request, no such user.')
-        profile = ThinkyUser.objects.get(user_id=users[0].id)
-        if not profile.is_mod:
-            return HttpResponse('User not a mod.')
-        profile.is_mod = False
 
 def is_strong_password(password):
     return len(password) >= 8 and any(c.isdigit() for c in password)
