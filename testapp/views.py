@@ -169,6 +169,28 @@ def curmodlist(request):
         ret[usr.username] = mod.user_id
     return JsonResponse(ret)
 
+@user_passes_test(is_a_mod, redirect_field_name=None)
+@require_POST
+def modboard(request):
+    action = request.POST.get('action', None)
+    if action not in ('create', 'remove'):
+        return HttpResponseBadRequest('Invalid action.')
+    board_name = request.POST.get('boardname', None)
+    if not board_name:
+        return HttpResponseBadRequest('Invalid board name.')
+    if action == "create":
+        board_desc = request.POST.get('boarddesc', None)
+        if not board_desc:
+            return HttpResponseBadRequest('Invalid board description.')
+        if Board.objects.get(board_name=board_name):
+            return HttpResponseBadRequest('Board name already exists.')
+        board = Board(board_name=board_name, board_desc=board_desc)
+        board.save()
+        return HttpResponse('Operation success.')
+    else:
+        # board removal not supported yet.
+        return HttpResponseBadRequest('Operation not supported.')
+
 def is_strong_password(password):
     return len(password) >= 8 and any(c.isdigit() for c in password)
 

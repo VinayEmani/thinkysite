@@ -48,24 +48,57 @@
         </div>
     </div>
 
-    <div id="boards-div" class="row">
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                Boards
-            </div>
+    <div id="boards-div">
+        <div class="row">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    Boards
+                </div>
 
-            <div class="panel-body" style="padding: 0;">
-                <div class="container-fluid">
-                {% for board in boards%}
-                    <div class="row" style="border: solid blue 1px;">
-                        <div class="col-lg-4">
-                        <b><a href="/testapp/board/?boardid={{ board.id }}">{{ board.board_name }} </a></b><br>
-                        <p>{{ board.board_desc }} </p>
+                <div class="panel-body" style="padding: 0;">
+                    <div class="container-fluid">
+                    {% for board in boards%}
+                        <div class="row" style="border: solid blue 1px;">
+                            <div class="col-lg-4">
+                            <b><a href="/testapp/board/?boardid={{ board.id }}">{{ board.board_name }} </a></b><br>
+                            <p>{{ board.board_desc }} </p>
+                            </div>
+                            <div class="col-lg-8">
+                            </div>
                         </div>
-                        <div class="col-lg-8">
-                        </div>
+                    {% endfor %}
                     </div>
-                {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <button id="add-board-button" class="row btn btn-info">
+            Add a new board 
+        </button>
+
+        <div class="row"><p></p></div>
+
+        <div class="row">
+            <div id="add-board-div">
+                <div class="col-lg-3" style="padding: 0;">
+                    <form id="add-board-options">
+                        <div class="form-group">
+                            <label for="add-board-name" >Board name</label>
+                            <input id="add-board-name" class="form-control" 
+                                name="boardname" type="text" placeholder="Board name"/>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="add-board-desc" >Board description</label>
+                            <input id="add-board-desc" class="form-control" 
+                                name="boarddesc" type="text" placeholder="Board description"/>
+                        </div>
+
+                        <input type="submit" value="Submit" id="add-board-submit" class="btn btn-info"/>
+                    </form>
+                </div>
+
+                <div class="col-lg-9">
                 </div>
             </div>
         </div>

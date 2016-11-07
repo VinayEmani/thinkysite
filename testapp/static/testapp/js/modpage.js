@@ -39,7 +39,6 @@ function updateMods(form_field_id, url, data_key) {
             },
 
             success: function(data) {
-                // Ideally, we should display the new mod list.
                 loadModList();
             },
 
@@ -50,9 +49,20 @@ function updateMods(form_field_id, url, data_key) {
     }
 };
 
-window.onload = function() {
+$(document).ready(function() {
     $("#add-mod-form").submit(
             updateMods("#add-mod-field", "/testapp/addnewmod/", "newmod"));
     $("#del-mod-form").submit(
             updateMods("#del-mod-field", "/testapp/deloldmod/", "oldmod"));
-};
+
+    $("#add-board-options").hide();
+    $("#add-board-button").on("click", function(event) {
+        $("#add-board-options").toggle();
+    });
+
+    $("#add-board-submit").on("click", function(event) {
+        event.preventDefault();
+
+        // Fire an ajax request.
+    });
+});
