@@ -54,12 +54,19 @@
                 Boards
             </div>
 
-            <div class="panel-body">
-                <p>
+            <div class="panel-body" style="padding: 0;">
+                <div class="container-fluid">
                 {% for board in boards%}
-                <b><a href="/testapp/board/?boardid={{ board.id }}">{{ board.board_name }} </a></b><br>
+                    <div class="row" style="border: solid blue 1px;">
+                        <div class="col-lg-4">
+                        <b><a href="/testapp/board/?boardid={{ board.id }}">{{ board.board_name }} </a></b><br>
+                        <p>{{ board.board_desc }} </p>
+                        </div>
+                        <div class="col-lg-8">
+                        </div>
+                    </div>
                 {% endfor %}
-                </p>
+                </div>
             </div>
         </div>
     </div>
