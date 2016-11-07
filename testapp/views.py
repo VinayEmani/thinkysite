@@ -85,37 +85,26 @@ class UserUpdateForm(forms.ModelForm):
         model = User
         fields = ['password', 'first_name', 'last_name']
 
+@login_required(login_url='/testapp/loginpage/')
 @require_POST
 def user_data_update(request):
-    instance = User.objects.get(id=request.user.id)
-    form = UserUpdateForm(request.POST, instance=instance)
-    if form.is_valid():
-        pass1, pass2 = form.cleaned_data['password'], form.data['password2']
-        modified = False
-        if pass1 != pass2:
-            messages.add_message(request, messages.INFO,
-                "Passwords don't match.")
-            return HttpResponseRedirect(reverse('testapp-profilepage'))
-        elif pass1 and not is_strong_password(pass1):
-            messages.add_message(request, messages.INFO,
-                "Password not strong enough.")
-            return HttpResponseRedirect(reverse('testapp-profilepage'))
-        elif is_strong_password(pass1):
-            instance.set_password(form.cleaned_data['password'])
-            modified = True
-        if form.cleaned_data['first_name']:
-            instance.first_name = form.cleaned_data['first_name']
-            modified = True
-        if form.cleaned_data['last_name']:
-            instance.last_name = form.cleaned_data['last_name']
-            modified = True
-        if modified:
-            instance.save()
+    pass1, pass2 = request.POST['password'], request.POST['password2']
+    first_name = request.POST['first_name']
+    last_name = request.POST['last_name']
+    if pass1 != pass2:
+        return HttpResponseBadRequest('Password confirmation failed')
+    elif pass1 and not is_strong_password(pass1):
+        return HttpResponseBadRequest('Password confirmation failed')
     else:
-        for err in form.errors:
-            messages.add_message(request, messages.INFO, err)
-
-    return HttpResponseRedirect(reverse('testapp-profilepage'))
+        user = request.user
+        if pass1:
+            user.set_password(pass1)
+        if user.first_name != first_name:
+            user.first_name = first_name
+        if user.last_name != last_name:
+            user.last_name = last_name 
+        user.save()
+        return HttpResponseRedirect('/testapp/profile/')
 
 def is_a_mod(user):
     if not user.is_authenticated:

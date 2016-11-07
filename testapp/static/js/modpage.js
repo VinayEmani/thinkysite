@@ -40,7 +40,6 @@ function updateMods(form_field_id, url, data_key) {
 
             success: function(data) {
                 // Ideally, we should display the new mod list.
-                alert("About to reload the current moderator list.");
                 loadModList();
             },
 
