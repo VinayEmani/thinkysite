@@ -155,6 +155,8 @@ def addnewmod(request):
 @require_POST
 def deloldmod(request):
     oldmodname = request.POST.get('oldmod')
+    if oldmodname == request.user.username:
+        return HttpResponseBadRequest("Bad request, can't unmod yourself.")
     if not oldmodname:
         return HttpResponseBadRequest('Bad request, empty username.')
     else:

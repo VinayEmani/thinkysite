@@ -24,9 +24,10 @@ function loadModList() {
 function updateMods(form_field_id, url, data_key) {
     return function(e) {
         e.preventDefault();
-        // Ideally, we need to read this from cookie.
+        // TODO(vinay) :- Ideally, should read this from cookie.
         var csrftoken = $("#add-mod-form")[0].children[0].value;
         var modname  = $(form_field_id)[0].value;
+        $(form_field_id)[0].value = "";
         var data = {};
         data[data_key] = modname;
         $.ajax({
@@ -39,6 +40,7 @@ function updateMods(form_field_id, url, data_key) {
 
             success: function(data) {
                 // Ideally, we should display the new mod list.
+                alert("About to reload the current moderator list.");
                 loadModList();
             },
 
