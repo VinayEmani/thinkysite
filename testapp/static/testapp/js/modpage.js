@@ -97,13 +97,16 @@ $(document).ready(function() {
     $("#add-board-options").hide();
     $("#add-board-button").on("click", function(event) {
         $("#add-board-options").toggle();
-        window.location.hash = "#add-board-options";
+        if ($("#add-board-options").is(":visible"))
+            window.location.hash = "#add-board-options";
     });
 
     $("#add-board-submit").on("click", function(event) {
         event.preventDefault();
         var boardname = $("#add-board-name").val();
         var boarddesc = $("#add-board-desc").val();
+        $("#add-board-name").val("");
+        $("#add-board-desc").val("");
 
         if (boardname.length === 0 || boarddesc.length === 0) {
             alert("Name or description can't be empty.");

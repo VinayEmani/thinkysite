@@ -12,7 +12,7 @@ from django.core.validators import validate_email
 from django.template import loader
 from django.views.decorators.http import require_http_methods, require_POST, require_GET
 
-from .models import ThinkyUser, Board
+from .models import ThinkyUser, Board, SubForum
 
 # Create your views here.
 def index(request):
@@ -168,6 +168,28 @@ def curmodlist(request):
         usr = User.objects.get(id=mod.user_id)
         ret[usr.username] = mod.user_id
     return JsonResponse(ret)
+
+@require_GET
+def board(request):
+    boardid = request.GET.get('boardid', None)
+    if boardid is None:
+        return HttpResponseRedirect('/testapp/home/')
+    try:
+        board = Board.objects.get(id=boardid)
+        forums = SubForum.objects.filter(board_id=boardid)
+        context = get_base_context(request)
+        context.update(
+            name=board.board_name,
+            desc=board.board_desc,
+            id=boardid,
+            forums=forums,
+        )
+        template = loader.get_template('testapp/boardpage.html')
+        return HttpResponse(template.render(context, request))
+    except:
+        template = loader.get_template("testapp/boardnotfound.html")
+        return HttpResponse(template.render(
+            get_base_context(request), request))
 
 @require_GET
 def getboards(request):
