@@ -169,24 +169,39 @@ def curmodlist(request):
         ret[usr.username] = mod.user_id
     return JsonResponse(ret)
 
+@require_GET
+def getboards(request):
+    boards = Board.objects.all()
+    return JsonResponse(
+            {b.id: {"name": b.board_name,
+                    "desc": b.board_desc} for b in boards})
+
 @user_passes_test(is_a_mod, redirect_field_name=None)
 @require_POST
 def modboard(request):
+    SUCCESS = 0
+    FAILURE = 1
+
     action = request.POST.get('action', None)
     if action not in ('create', 'remove'):
-        return HttpResponseBadRequest('Invalid action.')
+        return JsonResponse(dict(retCode=FAILURE,
+                                 explanation="Invalid action"))
     board_name = request.POST.get('boardname', None)
     if not board_name:
-        return HttpResponseBadRequest('Invalid board name.')
+        return JsonResponse(dict(retCode=FAILURE,
+                                 explanation="Invalid Board name"))
     if action == "create":
         board_desc = request.POST.get('boarddesc', None)
         if not board_desc:
-            return HttpResponseBadRequest('Invalid board description.')
-        if Board.objects.get(board_name=board_name):
-            return HttpResponseBadRequest('Board name already exists.')
+            return JsonResponse(dict(retCode=FAILURE,
+                                     explanation="Invalid Board description."))
+        if Board.objects.filter(board_name=board_name):
+            return JsonResponse(dict(retCode=FAILURE,
+                                     explanation="Board name already exists."))
         board = Board(board_name=board_name, board_desc=board_desc)
         board.save()
-        return HttpResponse('Operation success.')
+        return JsonResponse(dict(retCode=SUCCESS,
+                                 explanation="Board successfully added."))
     else:
         # board removal not supported yet.
         return HttpResponseBadRequest('Operation not supported.')
