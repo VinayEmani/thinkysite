@@ -20,10 +20,12 @@ def index(request):
 
 def get_base_context(request, **kwargs):
     user = request.user
+    is_mod = False
     if 'is_mod' in kwargs:
         is_mod = kwargs.get('is_mod')
     else:
-        is_mod = ThinkyUser.objects.get(user_id=user.id).is_mod
+        if user.is_authenticated:
+            is_mod = ThinkyUser.objects.get(user_id=user.id).is_mod
     return dict(user=user, is_mod=is_mod)
 
 @require_GET
