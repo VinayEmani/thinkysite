@@ -30,6 +30,25 @@ def get_base_context(request, **kwargs):
 def homepage(request):
     template = loader.get_template('testapp/homepage.html')
     boards = Board.objects.all()
+    forums = SubForum.objects.all()
+    boards = [(b.id, (b, [])) for b in boards]
+    for f in forums:
+        i = 0
+        while boards[i][0] != f.board_id:
+            i += 1
+        boards[i][1][1].append(f)
+
+    def tripartite(lst):
+        l = len(lst)
+        a, b, c = l // 3, l // 3, l // 3
+        if l % 3 >= 1:
+            a += 1
+        if l % 3 >= 2:
+            b += 1
+        return (lst[:a], lst[a:a + b], lst[a + b:])
+
+    boards = [(b[0], b[1][0], tripartite(b[1][1])) for b in boards]
+
     is_mod = False
     if request.user.is_authenticated:
         profile = ThinkyUser.objects.get(user_id=request.user.id)

@@ -9,13 +9,37 @@ Thinky - Daily food for your brain
 <div class="row">
 <div class="col-lg-9">
     <div class="panel-group">
+        <div class="container-fluid">
         {% for board in boards %}
+        <div class="row">
         <div class="panel panel-primary">
             <div class="panel-heading"><a style="color: white;"
-                href="/testapp/board/?boardid={{ board.id }}">{{ board.board_name }}</a></div>
-            <div class="panel-body"></div>
+                    href="/testapp/board/?boardid={{board.0}}">{{ board.1 }}</a>
+            </div>
+
+            <div class="panel-body">
+                <div class="col-lg-4">
+                    {% for p in board.2.0 %}
+                    <a href="/testapp/forum/?forumid={{p.id}}">{{ p.forum_name }}</a> <br>
+                    {% endfor %}
+                </div>
+
+                <div class="col-lg-4">
+                    {% for p in board.2.1 %}
+                    <a href="/testapp/forum/?forumid={{p.id}}">{{ p.forum_name }}</a> <br>
+                    {% endfor %}
+                </div>
+
+                <div class="col-lg-4">
+                    {% for p in board.2.2 %}
+                    <a href="/testapp/forum/?forumid={{p.id}}">{{ p.forum_name }}</a> <br>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
         </div>
         {% endfor %}
+        </div>
     </div>
 </div>
 
