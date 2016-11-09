@@ -11,7 +11,8 @@ Thinky - Daily food for your brain
     <div class="panel-group">
         {% for board in boards %}
         <div class="panel panel-primary">
-            <div class="panel-heading">{{ board.board_name }}</div>
+            <div class="panel-heading"><a style="color: white;"
+                href="/testapp/board/?boardid={{ board.id }}">{{ board.board_name }}</a></div>
             <div class="panel-body"></div>
         </div>
         {% endfor %}

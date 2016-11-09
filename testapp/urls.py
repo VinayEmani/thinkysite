@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^profile/', views.profilepage, name='testapp-profilepage'),
     url(r'^board/', views.board, name='testapp-board'),
     url(r'^mod/board/', views.modboard, name='testapp-mod-board'),
+    url(r'^mod/forum/', views.modforum, name='testapp-mod-forum'),
     url(r'^mod/', views.modpage, name='testapp-modpage'),
     url(r'^addnewmod/', views.addnewmod, name='testapp-add-mod'),
     url(r'^deloldmod/', views.deloldmod, name='testapp-del-mod'),

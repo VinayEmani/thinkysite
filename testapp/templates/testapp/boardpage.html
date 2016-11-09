@@ -9,52 +9,30 @@
 {% endblock %}
 
 {% block maincontent %}
-<h3 class="text-primary">{{ name }}</h3>
-<h4 class="text-primary"><i>{{ desc }}</i></h4>
-
-<!-- context is user, is_mod, forum(id, name, desc), forums -->
 <div class="container-fluid">
-    <div class="row">
-        <div class="panel panel-primary">
-            <div class="panel panel-heading">
-                Forums 
-            </div>
+    <h3 class="text-primary">{{ name }}</h3>
+    <h4 class="text-primary"><i>{{ desc }}</i></h4>
 
-            <div class="panel panel-body" style="padding: 0;">
+    <br>
+<!-- context is user, is_mod, board(id, name, desc), forums -->
+    <div class="row panel panel-primary"> 
+        <div class="panel-heading">
+            {{name}}
+        </div>
+
+        <div class="panel-body" style="padding: 0">
+            <div class="container-fluid">
+            {% for forum in forums %}
+                    <div class="row" style="border: solid blue 1px;">
+                        <div class="col-lg-6">
+                            <a href="/testapp/forum/?forumid={{forum.id}}"><b>{{forum.forum_name}}</b></a><br>
+                            {{ forum.forum_desc }}
+                        </div>
+                        <div class="col-lg-6">
+                        </div>
+                    </div>
+            {% endfor %}
             </div>
         </div>
     </div>
-
-    <button id="add-forum-button" class="row btn btn-info">
-            Add a new forum 
-    </button>
-
-    <div class="row"><p></p></div>
-
-    <div class="row">
-        <div id="add-forum-div">
-            <div class="col-lg-3" style="padding: 0;">
-                <form id="add-forum-options">
-                    <div class="form-group">
-                        <label for="add-forum-name" >Forum name</label>
-                        <input id="add-forum-name" class="form-control" 
-                            name="forumname" type="text" placeholder="Forum name"/>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="add-forum-desc" >Forum description</label>
-                        <input id="add-forum-desc" class="form-control" 
-                            name="forumdesc" type="text" placeholder="Forum description"/>
-                    </div>
-
-                    <input type="submit" value="Submit" id="add-forum-submit" class="btn btn-info"/>
-                </form>
-            </div>
-
-            <div class="col-lg-9">
-            </div>
-        </div>
-    </div>
-</div>
-
 {% endblock %}

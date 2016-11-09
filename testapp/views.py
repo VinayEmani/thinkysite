@@ -228,6 +228,38 @@ def modboard(request):
         # board removal not supported yet.
         return HttpResponseBadRequest('Operation not supported.')
 
+@user_passes_test(is_a_mod, redirect_field_name=None)
+@require_POST
+def modforum(request):
+    action = request.POST.get('action', None)
+
+    SUCCESS = 0
+    FAILURE = 1
+
+    if action not in ("create", "delete"):
+        return JsonResponse(dict(retCode=FAILURE,
+                            explanation="Invalid action"))
+    if action == "delete":
+        return JsonResponse(dict(retCode=FAILURE,
+                            explanation="Operation not supported yet"))
+    else:
+        fname = request.POST.get('name', None)
+        fdesc = request.POST.get('desc', None)
+        boardid = request.POST.get('boardid', None)
+        if not fname or not fdesc:
+            return JsonResponse(dict(retCode=FAILURE,
+                explanation="Invalid forum name or description"))
+
+        forums = SubForum.objects.filter(board_id=boardid, forum_name=fname)
+        if forums:
+            return JsonResponse(dict(retCode=FAILURE,
+                explanation="A forum already exists with this name in this board"))
+        subforum = SubForum(board_id=boardid, forum_name=fname,
+                            forum_desc=fdesc)
+        subforum.save()
+        return JsonResponse(dict(retCode=SUCCESS,
+                explanation="Successfully added a new forum"))
+
 def is_strong_password(password):
     return len(password) >= 8 and any(c.isdigit() for c in password)
 

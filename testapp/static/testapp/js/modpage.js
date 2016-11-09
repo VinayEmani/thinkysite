@@ -1,7 +1,3 @@
-function getCSRFToken() {
-    return $("[name=csrfmiddlewaretoken]").val();
-}
-
 function loadModList() {
     // Send a http request to /testapp/curmodlist and get all the mod list.
     $.ajax({
@@ -28,7 +24,7 @@ function loadModList() {
 function updateMods(form_field_id, url, data_key) {
     return function(e) {
         e.preventDefault();
-        var csrfToken = getCSRFToken();
+        var csrfToken = common.getCSRFToken();
         var modname  = $(form_field_id)[0].value;
         $(form_field_id)[0].value = "";
         var data = {};
@@ -123,7 +119,7 @@ $(document).ready(function() {
                 "boarddesc": boarddesc,
             },
             beforeSend: function(xhr) {
-                xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
+                xhr.setRequestHeader("X-CSRFToken", common.getCSRFToken());
             },
 
             success: function (data, status, jqXHR) {
