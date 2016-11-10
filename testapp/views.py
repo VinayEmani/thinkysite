@@ -12,7 +12,8 @@ from django.core.validators import validate_email
 from django.template import loader
 from django.views.decorators.http import require_http_methods, require_POST, require_GET
 
-from .models import ThinkyUser, Board, SubForum
+from .models import Thread, Comment, ThinkyUser, Board, SubForum
+from datetime import datetime
 
 # Create your views here.
 def index(request):
@@ -280,6 +281,47 @@ def modforum(request):
         subforum.save()
         return JsonResponse(dict(retCode=SUCCESS,
                 explanation="Successfully added a new forum"))
+
+@require_GET
+def newthread(request):
+    context = get_base_context(request)
+    forumid = request.GET.get('forumid', None)
+    context.update(forumid=forumid)
+    template = loader.get_template('testapp/newthread.html')
+    return HttpResponse(template.render(context, request))
+
+@login_required(redirect_field_name=None)
+@require_POST
+def createthread(request):
+    # forumid, title, posted_by_id, post_date, thread_type, last_post_time
+    forumid = request.POST.get('forumid', None)
+    title = request.POST.get('title', None)
+    posted_by_id = request.user.id
+    post_date = datetime.now()
+    try:
+        thread = Thread.objects.create(sub_forum_id=forumid,
+                    title=title, posted_by_id=posted_by_id,
+                    post_date=post_date, last_post_time=post_date,
+                    thread_type=0)
+        return HttpResponseRedirect('/testapp/forum/?forumid=%s' % forumid)
+    except:
+        return HttpResponseBadRequest('Failed creating a new thread')
+
+@require_GET
+def forumpage(request):
+    forumid = request.GET.get('forumid', None)
+    if not forumid:
+        return HttpResponse('Invalid forum page')
+    try:
+        forum = SubForum.objects.get(id=forumid)
+        start = request.GET.get('start', 1)
+        context = get_base_context(request)
+        threads = Thread.objects.filter(sub_forum_id=forumid)
+        context.update(forum=forum, threads=threads)
+        template = loader.get_template('testapp/forumpage.html')
+        return HttpResponse(template.render(context, request))
+    except:
+        return HttpResponse('Forum not found')
 
 def is_strong_password(password):
     return len(password) >= 8 and any(c.isdigit() for c in password)

@@ -1,0 +1,35 @@
+{% extends 'testapp/base.html' %}
+
+{% block title %}
+New Thread
+{% endblock %}
+
+{% block maincontent %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-6">
+            <form id="newthreadform" method="post"
+                action="/testapp/createthread/">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="thread-title">Title:</label>
+                    <input id="thread-title" class="form-control" type="text" name="title"
+                        placeholder="Title"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="thread-text">Text:</label>
+                    <input class="form-control" id="thread-tet" type="text" name="text"
+                        placeholder="Text"/>
+                </div>
+
+                <input type="hidden" name="forumid" value="{{ forumid }}"/>
+
+                <button class="btn btn-info" id="thread-create-button">
+                    Post new thread
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

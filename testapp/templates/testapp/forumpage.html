@@ -1,0 +1,48 @@
+{% extends 'testapp/base.html' %}
+
+<!-- context is user, is_mod, forum(id, name, desc), thread list-->
+{% block title %}
+{{ forum.forum_name }}
+{% endblock %}
+
+{% block maincontent %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-3">
+            <a href="/testapp/newthread/?forumid={{ forum.id }}">
+                <span style="font-weight: bold;font-size: 1.2em;">New Thread</span></a>
+        </div>
+
+        <div class="col-lg-6">
+        </div>
+
+        <div class="col-lg-3">
+        </div>
+    </div>
+
+    <br>
+
+    <table class="table table-bordered table-striped">
+    <thead>
+    <tr>
+        <th>Number</th>
+        <th>Title</th>
+        <th>Comments</th>
+        <th>Last commented on</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for thread in threads %}
+    <tr>
+        <td>{{ forloop.counter }}</td>
+        <td><a href="/testapp/thread/?threadid={{ thread.id }}">{{ thread.title }}</a></td>
+        <td>{{ thread.num_comments }}</td>
+        <td>{{ thread.last_post_time }} UTC</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+
+    </table>
+</div>
+{% endblock %}

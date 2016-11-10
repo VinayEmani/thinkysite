@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from datetime import datetime
 
 # Create your models here.
 
@@ -44,6 +45,9 @@ class Thread(models.Model):
     posted_by = models.ForeignKey(User, on_delete=models.CASCADE)
     post_date = models.DateTimeField()
     thread_type = models.IntegerField(default=0)
+    last_post_time = models.DateTimeField(
+            default=datetime(year=1980, month=1, day=1))
+    num_comments = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
