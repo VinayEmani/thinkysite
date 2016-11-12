@@ -13,7 +13,7 @@ from django.template import loader
 from django.views.decorators.http import require_http_methods, require_POST, require_GET
 
 from .models import Thread, Comment, ThinkyUser, Board, SubForum
-from datetime import datetime
+from datetime import timezone, datetime
 
 # Create your views here.
 def index(request):
@@ -296,6 +296,8 @@ def createthread(request):
     # forumid, title, posted_by_id, post_date, thread_type, last_post_time
     forumid = request.POST.get('forumid', None)
     title = request.POST.get('title', None)
+    if not title:
+        return HttpResponseBadRequest('Title can\'t be empty.')
     posted_by_id = request.user.id
     post_date = datetime.now()
     try:
@@ -306,6 +308,46 @@ def createthread(request):
         return HttpResponseRedirect('/testapp/forum/?forumid=%s' % forumid)
     except:
         return HttpResponseBadRequest('Failed creating a new thread')
+
+@require_GET
+def threadpage(request):
+    threadid = request.GET.get('threadid', None)
+    if not threadid:
+        return HttpResponseBadRequest('Thread not found')
+
+    start = int(request.GET.get('start', '1')) - 1
+    count = int(request.GET.get('count', '10'))
+    try:
+        thread = Thread.objects.get(id=threadid)
+        comments = Comment.objects.filter(thread_id=threadid).order_by('post_date')[start:start+count]
+        template = loader.get_template('testapp/threadpage.html')
+        context = get_base_context(request)
+        context.update(thread=thread, start=start, comments=comments)
+    except:
+        return HttpResponseBadRequest('Invalid request parameters.')
+    return HttpResponse(template.render(context, request))
+
+
+@login_required(redirect_field_name=None)
+@require_POST
+def newcomment(request):
+    threadid = request.GET.get('threadid', None)
+    if not threadid:
+        return HttpResponseBadRequest('Invalid thread')
+    text = request.POST.get('commenttext')
+    post_date = datetime.now(tz=timezone.utc)
+    start = 0
+    try:
+        comment = Comment.objects.create(thread_id=threadid,
+                posted_by_id=request.user.id, text=text,
+                post_date=post_date)
+        comment.thread.last_post_time = post_date
+        comment.thread.num_comments += 1
+        start = max(comment.thread.num_comments - 9, 1)
+        comment.thread.save()
+    except:
+        return HttpResponseBadRequest('Unknown error - invalid thread id likely cause.')
+    return HttpResponseRedirect('/testapp/thread/?threadid=%s&start=%s' % (threadid, str(start)))
 
 @require_GET
 def forumpage(request):

@@ -4,12 +4,18 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import datetime
 
+import pytz
+
 # Create your models here.
 
 class ThinkyUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_pic = models.ImageField(upload_to='pics/', blank=True)
     is_mod = models.BooleanField(default=False)
+    timezones = [(x, x) for x in pytz.all_timezones]
+    timezone = models.CharField(max_length=50,
+                                choices=timezones,
+                                default='UTC')
 
     def __str__(self):
         return '%s\'s profile' % self.user.username
