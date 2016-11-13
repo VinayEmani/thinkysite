@@ -44,8 +44,11 @@ function editComment(event) {
 
 $(document).ready(function () {
     $(".unixtime").each(function(i, e) {
-        unixtime = 1000 * Math.floor($(e).attr("value"));
-        $(e).attr("title", getTimeDescription(unixtime));
+
+        $(e).mouseenter(function(event) {
+            unixtime = 1000 * Math.floor($(this).attr("value"));
+            $(e).attr("title", getTimeDescription(unixtime));
+        });
     })
 
     $(".editcomment").on("click", editComment);
