@@ -1,5 +1,12 @@
 {% extends 'testapp/base.html' %}
 
+{% load timetags %}
+
+<!-- This is within the head section. -->
+{% block extra_includes %}
+<script type="text/javascript" src="/static/testapp/js/threadpage.js"></script>
+{% endblock %}
+
 <!-- Context is user, is_mod, thread, comment list -->
 {% block title %}
     {{thread.title}}
@@ -42,35 +49,46 @@
 
                 <div class="col-lg-12 panel-body">
                     <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-lg-3">
-                                #{{ forloop.counter|add:start }}<br>
-                                <a href="/testapp/profile/?pid={{ comment.posted_by.id }}">{{ comment.posted_by.username }}</a>
+                        <div class="row commentrow" id="{{comment.id}}">
+                            <div class="col-lg-1 text-center">
+                                {{ forloop.counter|add:start }}
                                 <br>
-                                {{ comment.post_date }} UTC
                             </div>
 
-                            <div class="col-lg-6" style="vertical-align: center;">
+                            <div class="col-lg-3">
+                                <a href="/testapp/profile/?pid={{ comment.posted_by.id }}">{{ comment.posted_by.username }}</a>
+                                <br>
+                                <div class="unixtime" value="{{ comment.post_date|getunixtime }}">
+                                    {{comment.post_date}}</div>
+                            </div>
+
+                            <div class="col-lg-5" style="vertical-align: center;">
                                 {{ comment.text }}
                             </div>
 
                             <div class="col-lg-3">
                                 {% ifequal user.id comment.posted_by.id %}
-                                <button class="btn btn-info">
+                                <button class="editcomment btn btn-info">
                                     Edit
                                 </button>
 
-                                <button class="btn btn-warning">
+                                <button class="deletecomment btn btn-warning">
                                     Delete
                                 </button>
+
                                 {% else %}
-                                <button class="btn btn-info">
-                                    +
+                                <button class="upvotecomment btn btn-info">
+                                    <span class="glyphicon glyphicon-arrow-up">
+                                        {{ comment.upvotes }}
+                                    </span>
                                 </button>
 
-                                <button class="btn btn-warning">
-                                    -
+                                <button class="downvotecomment btn btn-warning">
+                                    <span class="glyphicon glyphicon-arrow-down">
+                                        {{ comment.downvotes }}
+                                    </span>
                                 </button>
+
                                 {% endifequal %}
                             </div>
                         </div>

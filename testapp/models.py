@@ -63,6 +63,13 @@ class Comment(models.Model):
     text = models.CharField(max_length=2000)
     posted_by = models.ForeignKey(User, on_delete=models.CASCADE)
     post_date = models.DateTimeField()
+    upvotes = models.IntegerField(default=0)
+    downvotes = models.IntegerField(default=0)
 
     def __str__(self):
         return 'Thread #%s' % self.id
+
+class Vote(models.Model):
+    voter = models.ForeignKey(User, on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    weight = models.IntegerField(default=0, choices=[(1, 'UP'), (2, 'DOWN')])

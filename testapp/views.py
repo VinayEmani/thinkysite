@@ -19,6 +19,7 @@ from datetime import timezone, datetime
 def index(request):
     return HttpResponse('Welcome to test app django project.')
 
+# user, is_mod, timezone
 def get_base_context(request, **kwargs):
     user = request.user
     is_mod = False
@@ -299,7 +300,7 @@ def createthread(request):
     if not title:
         return HttpResponseBadRequest('Title can\'t be empty.')
     posted_by_id = request.user.id
-    post_date = datetime.now()
+    post_date = datetime.now(tz=timezone.utc)
     try:
         thread = Thread.objects.create(sub_forum_id=forumid,
                     title=title, posted_by_id=posted_by_id,
@@ -323,9 +324,9 @@ def threadpage(request):
         template = loader.get_template('testapp/threadpage.html')
         context = get_base_context(request)
         context.update(thread=thread, start=start, comments=comments)
+        return HttpResponse(template.render(context, request))
     except:
         return HttpResponseBadRequest('Invalid request parameters.')
-    return HttpResponse(template.render(context, request))
 
 
 @login_required(redirect_field_name=None)
