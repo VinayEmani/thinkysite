@@ -1,5 +1,11 @@
 {% extends 'testapp/base.html' %}
 
+{% load timetags %}
+
+{% block extra_includes %}
+<script type="text/javascript" src="/static/testapp/js/forumpage.js"></script>
+{% endblock %}
+
 <!-- context is user, is_mod, forum(id, name, desc), thread list-->
 {% block title %}
 {{ forum.forum_name }}
@@ -38,7 +44,8 @@
         <td>{{ forloop.counter }}</td>
         <td><a href="/testapp/thread/?threadid={{ thread.id }}">{{ thread.title }}</a></td>
         <td>{{ thread.num_comments }}</td>
-        <td>{{ thread.last_post_time }} UTC</td>
+        <td><div class="unixtime" value="{{ thread.last_post_time|getunixtime}}">
+            {{ thread.last_post_time|getunixtime|to_timezone:timezone }}</div></td>
     </tr>
     {% endfor %}
     </tbody>

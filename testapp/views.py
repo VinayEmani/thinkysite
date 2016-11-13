@@ -14,21 +14,26 @@ from django.views.decorators.http import require_http_methods, require_POST, req
 
 from .models import Thread, Comment, ThinkyUser, Board, SubForum
 from datetime import timezone, datetime
+import pytz
 
 # Create your views here.
 def index(request):
     return HttpResponse('Welcome to test app django project.')
 
-# user, is_mod, timezone
+# user, is_mod, timezone object.
 def get_base_context(request, **kwargs):
     user = request.user
     is_mod = False
-    if 'is_mod' in kwargs:
-        is_mod = kwargs.get('is_mod')
+    if not user.is_authenticated:
+        timezone = timezone.utc
     else:
-        if user.is_authenticated:
-            is_mod = ThinkyUser.objects.get(user_id=user.id).is_mod
-    return dict(user=user, is_mod=is_mod)
+        profile = ThinkyUser.objects.get(user_id=user.id)
+        is_mod = profile.is_mod
+        try:
+            timezone = pytz.timezone(profile.timezone)
+        except:
+            timezone = timezone.utc
+    return dict(user=user, timezone=timezone, is_mod=is_mod)
 
 @require_GET
 def homepage(request):
