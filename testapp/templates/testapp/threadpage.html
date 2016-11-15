@@ -59,7 +59,7 @@
                                 <a href="/testapp/profile/?pid={{ comment.posted_by.id }}">{{ comment.posted_by.username }}</a>
                                 <br>
                                 <div class="unixtime" value="{{ comment.post_date|getunixtime }}">
-                                    {{comment.post_date}}</div>
+                                    {{comment.post_date|getunixtime|to_timezone:timezone}}</div>
                             </div>
 
                             <div class="col-lg-5" style="vertical-align: center;">
